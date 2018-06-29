@@ -26,40 +26,28 @@ namespace spider
             LogHelper.WriteLog("开始抓取");
             string SpiderTime = DateTime.Now.ToString("yyyy-MM-dd");
             //获取所有账号
-            bool islogin = true;
-            string str = "";
-            DataTable dt = DBHelper.ExecuteSelect("select * from LR_Demo_CPA2 order by F_QueryName asc");
 
+            DataTable dt = DBHelper.ExecuteSelect("select * from LR_Demo_CPA2");
             for (int i = 0; i < dt.Rows.Count; i++)
             {
 
-                //多条记录，如果用户名和前一条一样，就不用再登录，直接抓取数据
-                if (i > 0 && dt.Rows[i]["F_ProductName"].ToString() == dt.Rows[i - 1]["F_ProductName"].ToString())
-                {
-                    islogin = false;
-                }
-                
                 HttpClient httpClient = new HttpClient();
-                if (islogin)
-                {
 
-
-                    LogHelper.WriteLog("访问阿里巴巴登录页");
-                    string content = httpClient.GetResponse("", "https://passport.alibaba.com/mini_login.htm?lang=zh_cn&appName=youmeng&appEntrance=default&styleType=auto&bizParams=&notLoadSsoView=true&notKeepLogin=false&isMobile=false&cssLink=https://passport.umeng.com/css/loginIframe.css&rnd=0.11412324061518286", "", "");
-                    Thread.Sleep(1000);
-                    LogHelper.WriteLog("获取登录秘钥str");
-                    RegFunc rg = new RegFunc();
-                    var _csrf_token = rg.GetStr(content, "_csrf_token\" value=\"", "\" type=\"hidden");
-                    LogHelper.WriteLog(dt.Rows[i]["F_ProductName"] + "开始登陆");
-                    var loginjson = PostUrl("https://passport.alibaba.com/newlogin/login.do?fromSite=-2&appName=youmeng", "loginId=" + dt.Rows[i]["F_QueryName"] + "" +
-                        "&password2=" + dt.Rows[i]["F_QueryPwd2"] + "" +
-                        "&checkCode=&appName=youmeng&appEntrance=default&bizParams=" +
-                        "&ua=" +
-                         "&umidGetStatusVal=255&lrfcf=&lang=zh_CN&scene=&isMobile=false&screenPixel=1920x1080&navlanguage=zh-CN&navUserAgent=Mozilla%2F5.0+(Windows+NT+10.0%3B+WOW64)+AppleWebKit%2F537.36+(KHTML%2C+like+Gecko)+Chrome%2F58.0.3029.96+Safari%2F537.36&navAppVersion=&navPlatform=Win32&token=&nocAppKey=&csessionid=&sig=&captchaToken=" +
-                         "&_csrf_token=" + _csrf_token + "");
-                     str = rg.GetStr(loginjson, "\"st\":\"", "\"");
-                    Thread.Sleep(1000);
-                }
+                LogHelper.WriteLog("访问阿里巴巴登录页");
+                string content = httpClient.GetResponse("", "https://passport.alibaba.com/mini_login.htm?lang=zh_cn&appName=youmeng&appEntrance=default&styleType=auto&bizParams=&notLoadSsoView=true&notKeepLogin=false&isMobile=false&cssLink=https://passport.umeng.com/css/loginIframe.css&rnd=0.11412324061518286", "", "");
+                Thread.Sleep(1000);
+                LogHelper.WriteLog("获取登录秘钥str");
+                RegFunc rg = new RegFunc();
+                var _csrf_token = rg.GetStr(content, "_csrf_token\" value=\"", "\" type=\"hidden");
+                LogHelper.WriteLog(dt.Rows[i]["F_ProductName"] + "开始登陆");
+                var loginjson = PostUrl("https://passport.alibaba.com/newlogin/login.do?fromSite=-2&appName=youmeng", "loginId=" + dt.Rows[i]["F_QueryName"] + "" +
+                    "&password2=" + dt.Rows[i]["F_QueryPwd2"] + "" +
+                    "&checkCode=&appName=youmeng&appEntrance=default&bizParams=" +
+                    "&ua=" +
+                     "&umidGetStatusVal=255&lrfcf=&lang=zh_CN&scene=&isMobile=false&screenPixel=1920x1080&navlanguage=zh-CN&navUserAgent=Mozilla%2F5.0+(Windows+NT+10.0%3B+WOW64)+AppleWebKit%2F537.36+(KHTML%2C+like+Gecko)+Chrome%2F58.0.3029.96+Safari%2F537.36&navAppVersion=&navPlatform=Win32&token=&nocAppKey=&csessionid=&sig=&captchaToken=" +
+                     "&_csrf_token=" + _csrf_token + "");
+                var str = rg.GetStr(loginjson, "\"st\":\"", "\"");
+                Thread.Sleep(1000);
                 if (!string.IsNullOrEmpty(str))
                 {
                     LogHelper.WriteLog("获取登录秘钥str成功");
