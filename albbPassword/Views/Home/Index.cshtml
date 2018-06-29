@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<script type="text/javascript" charset="utf-8" src="https://g.alicdn.com/vip/havana-login/0.3.2/js/mini-login-min.js"></script>
+
+<p></p>
+
+
+<p><input type="button" name="name" value="一键更新" onclick="update()" /></p>
+
+<div class="row">
+    <div class="table-responsive">
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>数据编号</th>
+                    <th>
+                        名称
+                    </th>
+                    <th>
+                        采集URL
+                    </th>
+                    <th>
+                        账号名
+                    </th>
+                    <th>
+                        密码
+                    </th>
+                    <th>
+                        密码2
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < ViewBag.Data.Rows.Count; i++)
+                {
+                    <tr>
+                        <td>@ViewBag.Data.Rows[i]["F_CPAId"]</td>
+                        <td>@ViewBag.Data.Rows[i]["F_ProductName"]</td>
+                        <td>@ViewBag.Data.Rows[i]["F_QueryUrl"]</td>
+                        <td>@ViewBag.Data.Rows[i]["F_QueryName"]</td>
+                        <td>@ViewBag.Data.Rows[i]["F_QueryPwd"]</td>
+                        <td>@ViewBag.Data.Rows[i]["F_QueryPwd2"]</td>
+                    </tr>
+                }
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+    function update() {
+
+        var c = '@ViewBag.modulus', f = '@ViewBag.exponent', g = new RSAKey;
+        g.setPublic(c, f);
+
+        var arr = []
+        $("tbody tr").each(function () {
+            var F_QueryPwd2 = g.encrypt($(this).find("td").eq(4).html());
+                $(this).find("td").eq(5).html(F_QueryPwd2)
+            var json = {
+                F_CPAId :$(this).find("td").eq(0).html(),
+                F_QueryPwd2: F_QueryPwd2
+            }
+            arr.push(json)
+        })
+        
+        $.post('/home/update', { data: JSON.stringify(arr)}, function (data) {
+
+
+        })
+    }
+
+</script>
+
+
